@@ -52,8 +52,26 @@ def check_requirements():
     required = {
         "cmake": ["cmake", "--version"],
         "python": ["python", "--version"],
-        "clang": ["clang", "--version"],
     }
+    
+    # Check for C++ compiler (clang or MSVC)
+    compiler_found = False
+    compiler_name = None
+    
+    for compiler_cmd in ["clang", "clang-cl", "cl"]:
+        try:
+            subprocess.run([compiler_cmd, "--version"], capture_output=True, check=True, timeout=5)
+            compiler_found = True
+            compiler_name = compiler_cmd
+            logger.info(f"Found C++ compiler: {compiler_cmd}")
+            break
+        except:
+            pass
+    
+    if not compiler_found:
+        logger.error("No C++ compiler found (need clang, clang-cl, or MSVC cl)")
+        logger.error("Please install Visual Studio with C++ tools or install LLVM Clang")
+        return False
     
     missing = []
     for tool, cmd in required.items():
@@ -68,7 +86,7 @@ def check_requirements():
         return False
     
     logger.info("✓ All requirements met")
-    return True
+    return True, compiler_name
 
 def setup_logging(log_dir):
     """Setup logging directory."""
@@ -107,7 +125,12 @@ Examples:
     logger.info(f"Log directory: {log_dir}")
     
     # Check requirements
-    if not check_requirements():
+    requirements = check_requirements()
+    if isinstance(requirements, bool) and not requirements:
+        return 1
+    elif isinstance(requirements, tuple):
+        _, compiler_name = requirements
+    else:
         return 1
     
     # Step 1: Install Python dependencies
@@ -135,12 +158,22 @@ Examples:
     logger.info("\n[3/4] Compiling BitNet...")
     
     build_dir = "build"
-    cmake_cmd = [
-        "cmake", "-B", build_dir,
-        "-DCMAKE_C_COMPILER=clang",
-        "-DCMAKE_CXX_COMPILER=clang++",
-        "-DCMAKE_BUILD_TYPE=Release",
-    ]
+    
+    # Detect compiler and set appropriate flags
+    if compiler_name in ["clang", "clang-cl"]:
+        cmake_cmd = [
+            "cmake", "-B", build_dir,
+            "-DCMAKE_C_COMPILER=clang",
+            "-DCMAKE_CXX_COMPILER=clang++",
+            "-DCMAKE_BUILD_TYPE=Release",
+        ]
+    else:
+        # Use MSVC (Visual Studio generator)
+        logger.info("Using MSVC compiler (Visual Studio)")
+        cmake_cmd = [
+            "cmake", "-B", build_dir,
+            "-G", "Visual Studio 17 2022",
+        ]
     
     if not run_cmd(cmake_cmd,
                   "Generating CMake build files",
