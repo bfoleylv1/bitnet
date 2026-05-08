@@ -38,7 +38,6 @@ https://github.com/user-attachments/assets/7f46b736-edec-4828-b809-4be780a3e5b1
 This project is based on the [llama.cpp](https://github.com/ggerganov/llama.cpp) framework. We would like to thank all the authors for their contributions to the open-source community. Also, bitnet.cpp's kernels are built on top of the Lookup Table methodologies pioneered in [T-MAC](https://github.com/microsoft/T-MAC/). For inference of general low-bit LLMs beyond ternary models, we recommend using T-MAC.
 ## Official Models
 <table>
-    </tr>
     <tr>
         <th rowspan="2">Model</th>
         <th rowspan="2">Parameters</th>
@@ -157,6 +156,21 @@ This project is based on the [llama.cpp](https://github.com/ggerganov/llama.cpp)
 
 
 ## Installation
+
+### Quick Start (Recommended)
+
+For a simplified one-command build, see **[QUICKSTART.md](QUICKSTART.md)**:
+
+```bash
+# Linux/macOS
+bash build.sh
+
+# Windows
+build.bat
+
+# Any platform
+python build.py
+```
 
 ### Requirements
 - python>=3.9

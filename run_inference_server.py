@@ -22,6 +22,11 @@ def run_server():
     else:
         server_path = os.path.join(build_dir, "bin", "llama-server")
     
+    if not os.path.exists(server_path):
+        print(f"Error: llama-server binary not found at {server_path}")
+        print("Please run setup_env.py first to build the project.")
+        sys.exit(1)
+    
     command = [
         f'{server_path}',
         '-m', args.model,

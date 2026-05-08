@@ -21,6 +21,12 @@ def run_inference():
             main_path = os.path.join(build_dir, "bin", "llama-cli")
     else:
         main_path = os.path.join(build_dir, "bin", "llama-cli")
+    
+    if not os.path.exists(main_path):
+        print(f"Error: llama-cli binary not found at {main_path}")
+        print("Please run setup_env.py first to build the project.")
+        sys.exit(1)
+    
     command = [
         f'{main_path}',
         '-m', args.model,
